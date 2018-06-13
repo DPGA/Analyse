@@ -1,0 +1,218 @@
+
+#include "myplots.h"
+#include "histogramme.h"
+
+
+MyPlots::MyPlots(int Board,int Ch)
+{
+	x.reserve(1024);
+   y.reserve(1024);
+   this->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes | QCP::iSelectLegend | QCP::iSelectPlottables);
+   QString Text = "Board Id = 0x"+ QString::number(Board+16,16) +" Chan " + QString::number(Ch,10);
+   this->replot();
+   FisrtDisplay = true;
+   rubberBand = new QRubberBand(QRubberBand::Rectangle, this);
+	connect(this, SIGNAL(mousePress(QMouseEvent*)),  this, SLOT(mousePress(QMouseEvent*)));
+	connect(this, SIGNAL(mouseRelease(QMouseEvent*)),this, SLOT(mouseRelease(QMouseEvent*)));
+	connect(this, SIGNAL(mouseMove(QMouseEvent*)),   this, SLOT(mouseMove(QMouseEvent*)));
+
+}
+
+void MyPlots::mousePress( QMouseEvent *mevent )
+{
+    rubberOrigin = mevent->pos();
+     
+    if(mevent->button() == Qt::RightButton) {
+        rubberBand->setGeometry(QRect(rubberOrigin, QSize()));
+        rubberBand->show();
+    }
+}
+ 
+void MyPlots::mouseMove( QMouseEvent* mevent )
+{
+    rubberBand->setGeometry(QRect(rubberOrigin, mevent->pos()).normalized());
+}
+
+void MyPlots::mouseRelease( QMouseEvent* mevent )
+{
+    if (rubberBand->isVisible())
+    {
+        auto zoomRect = rubberBand->geometry();
+        int xp1, yp1, xp2, yp2;
+        zoomRect.getCoords(&xp1, &yp1, &xp2, &yp2);
+        auto x1 = this->xAxis->pixelToCoord(xp1);
+        auto x2 = this->xAxis->pixelToCoord(xp2);
+        // I have a common x axis
+        this->xAxis->setRange(x1, x2);
+         
+        auto numOfY = this->axisRect(0)->axisCount(QCPAxis::atLeft);
+        for(auto i=0; i<numOfY; ++i)
+        {
+            auto currentY = this->axisRect(0)->axis(QCPAxis::atLeft, i);
+            currentY->setRange(currentY->pixelToCoord(yp1), currentY->pixelToCoord(yp2));
+        }
+         
+        rubberBand->hide();
+        this->replot();
+    }
+}
+
+void MyPlots::SetPlotZoom(QString Legend)
+{
+	WinZoom  = new QMainWindow;
+	WinZoom_1  = new QMainWindow;
+
+//	PlotZoom_1 = new TVPlot();
+	WinZoom_1->setMinimumSize(800, 600);
+  // WinZoom_1->setCentralWidget(PlotZoom_1);
+   
+   PlotZoom = new MyPlots(0,0); //QCustomPlot();
+   PlotZoom->addGraph();
+   WinZoom->setMinimumSize(800, 600);
+   WinZoom->setCentralWidget(PlotZoom);
+   PlotZoom->plotLayout()->insertRow(0);
+   PlotZoom->plotLayout()->addElement(0, 0, new QCPTextElement(PlotZoom,Legend , QFont("sans", 12, QFont::Bold)));
+
+	connect(this,SIGNAL(mouseDoubleClick(QMouseEvent*)),this,SLOT(ZoomGraph(QMouseEvent*)));
+	connect(PlotZoom,SIGNAL(mouseDoubleClick(QMouseEvent*)),this,SLOT(ZoomGraph(QMouseEvent*)));
+}
+
+void MyPlots::SetPlotZoom(QString Legend,QVector<double> *ydiff)
+{
+	WinZoom  = new QMainWindow;
+	WinZoom_1  = new QMainWindow;
+
+//	PlotZoom_1 = new TVPlot();
+	WinZoom_1->setMinimumSize(800, 600);
+  // WinZoom_1->setCentralWidget(PlotZoom_1);
+   
+   PlotZoom = new MyPlots(0,0); //QCustomPlot();
+   PlotZoom->addGraph();
+   WinZoom->setMinimumSize(800, 600);
+   WinZoom->setCentralWidget(PlotZoom);
+   PlotZoom->plotLayout()->insertRow(0);
+   PlotZoom->plotLayout()->addElement(0, 0, new QCPTextElement(PlotZoom,Legend , QFont("sans", 12, QFont::Bold)));
+   Histogram *h = new Histogram( "TimeStamp Diff Thor Asm", Qt::red ); 
+   h->setValues(ydiff);
+ //  h->attach(PlotZoom_1);
+	connect(this,SIGNAL(mouseDoubleClick(QMouseEvent*)),this,SLOT(ZoomGraph(QMouseEvent*)));
+	connect(PlotZoom,SIGNAL(mouseDoubleClick(QMouseEvent*)),this,SLOT(ZoomGraph(QMouseEvent*)));
+}
+
+
+void MyPlots::ZoomGraph(QMouseEvent* mevent)
+{
+
+	if(mevent->button() == Qt::LeftButton) {
+		
+		PlotZoom->yAxis->setRange(this->yAxis->range());
+		PlotZoom->xAxis->setRange(this->xAxis->range());
+		PlotZoom->graph(0)->setData(this->graph(0)->data());
+		PlotZoom->graph(0)->setLineStyle(QCPGraph::lsImpulse);
+		PlotZoom->graph(0)->setScatterStyle(QCPScatterStyle::ssNone);
+		PlotZoom->graph(0)->setPen(QPen(Qt::blue));
+		PlotZoom->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes | QCP::iSelectLegend | QCP::iSelectPlottables);
+		PlotZoom->replot();
+		WinZoom->show();
+		WinZoom_1->show();
+	}
+}
+void MyPlots::UnZoomGraph(QMouseEvent* mevent)
+{
+	if(mevent->button() == Qt::LeftButton) {
+
+	}
+}
+
+MyPlots::~MyPlots()
+{
+
+}
+
+void MyPlots::DisplayGraph(unsigned short Srout,unsigned short *Data,int len)
+{
+    x.clear();
+    y.clear();
+    if (len <= 1024) {
+        for (int i=0;i<len;++i) {
+            x.push_back((double) i);
+            unsigned int d = ntohs(Data[i]) & 0xFFF;
+            y.push_back((double) (d));
+        }
+        for (int i=len;i<1024;i++)
+           x.push_back((double) i);
+
+        // create graph and assign data to it:
+        this->addGraph();
+        this->xAxis->setRange(0, 1024);
+        this->yAxis->setRange(200, 1000);
+        if (FisrtDisplay) {this->graph(0)->setData(x,y);FisrtDisplay=false;}
+        else this->graph(0)->addData(x,y);
+        this->graph(0)->setLineStyle(QCPGraph::lsNone);
+        this->graph(0)->setScatterStyle(QCPScatterStyle::ssCircle);
+        this->graph(0)->setPen(QPen(Qt::red));
+        this->replot();
+        if (ZoomActived) ZoomGraph(Srout,len);
+
+    }
+}
+
+void MyPlots::SetZoomGraph()
+{
+ // if (!ZoomActived) {
+    WinZoom->show();
+    ZoomActived = true;
+  //}
+}
+
+void MyPlots::ZoomGraph(unsigned short Srout,int len)
+{
+    QVector<double> liney(4096),linex(4096),cell0(4096);
+    QVector<double> yrescale(3000);
+    for (int k=0;k<4096;++k) {
+        liney[k] = k;
+        linex[k] = Srout;
+        double temp = len - Srout;
+        cell0[k] = 1024-Srout;
+    }
+    qInfo() << "Srout = " << hex << Srout << endl;
+
+    int j=Srout;
+    for (int i=0;i<len;++i)
+    {
+   //   qInfo() << "I = " << i << " j=" << j << " Srout "<< Srout << endl;
+      yrescale[j] = y[i]+200;
+      j = (j+1) % 1024;
+    }
+    //    if (ZoomActived && (ChZoom == ch) && (NoBoard == BoardZoom)) {
+    double min = *std::min_element(y.constBegin(), y.constEnd()) -200;
+    double max = *std::max_element(y.constBegin(), y.constEnd());
+    max = floor((max+200)/100)*100;
+    PlotZoom->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes | QCP::iSelectLegend | QCP::iSelectPlottables);
+//    PlotZoom->yAxis->setRange(min, max);
+    PlotZoom->yAxis->setRange(0, 2000);
+    PlotZoom->graph(0)->setData(x,y);
+    PlotZoom->graph(0)->setLineStyle(QCPGraph::lsNone);
+    PlotZoom->graph(0)->setScatterStyle(QCPScatterStyle::ssCircle);
+    PlotZoom->graph(0)->setPen(QPen(Qt::blue));
+    QString Text = "RawData: NbSample =  "+ QString::number(len,10);
+    PlotZoom->graph(0)->setName(Text);
+    PlotZoom->graph(1)->setPen(QPen(Qt::green));
+    QString SroutVal = "Srout " +QString::number(Srout);
+    PlotZoom->graph(1)->setName(SroutVal);
+    PlotZoom->graph(1)->setData(linex,liney);
+    PlotZoom->graph(2)->setData(cell0,liney);
+    PlotZoom->graph(2)->setPen(QPen(Qt::red));
+    PlotZoom->graph(2)->setName("Cell 0");
+    PlotZoom->graph(3)->setData(x,yrescale);
+    PlotZoom->graph(3)->setLineStyle(QCPGraph::lsNone);
+    PlotZoom->graph(3)->setScatterStyle(QCPScatterStyle::ssCross);
+    PlotZoom->graph(3)->setPen(QPen(Qt::yellow));
+    PlotZoom->graph(3)->setName("Begin cell 0");
+    // now you can access it at any time with title->setText, for example
+
+    PlotZoom->legend->setVisible(true);
+    PlotZoom->replot();
+   //     }
+
+}

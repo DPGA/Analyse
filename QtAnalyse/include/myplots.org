@@ -1,0 +1,46 @@
+#ifndef MYPLOTS_H
+#define MYPLOTS_H
+#include <qcustomplot.h>
+#include <arpa/inet.h>
+//#include <tvplot.h>
+
+
+class MyPlots :  public QCustomPlot
+{
+    Q_OBJECT
+    QWidget* m_mainWindow;
+
+public:
+    explicit MyPlots(int Board,int Ch);
+    ~MyPlots();
+    void SetPlotZoom(QString Legend);
+    void SetPlotZoom(QString Legend,QVector<double> *ydiff);
+    void DisplayGraph(unsigned short Srout,unsigned short *Data,int len);
+	 
+private slots:
+   void ZoomGraph(unsigned short Srout,int len);
+   void SetZoomGraph();
+   void ZoomGraph(QMouseEvent* mevent );
+	void mousePress(QMouseEvent *mevent);
+	void mouseMove(QMouseEvent* mevent);
+	void mouseRelease(QMouseEvent* mevent);
+	void UnZoomGraph(QMouseEvent* mevent);
+private :
+	
+	QRubberBand *rubberBand;
+	QPoint rubberOrigin;
+	QVector<double> x;
+	QVector<double> y;	
+	QMainWindow *WinZoom;
+	QMainWindow *WinZoom_1;
+	
+	QCustomPlot *PlotZoom;
+//	TVPlot *PlotZoom_1;
+//	QCustomPlot *PlotCell;
+	QCPTextElement *Title;
+	bool ZoomActived = false;
+	bool FisrtDisplay= true;
+};
+
+
+#endif // MYPLOTS_H

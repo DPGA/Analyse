@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1600</width>
+    <height>1200</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <widget class="QTabWidget" name="onglets">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>10</y>
+      <width>1261</width>
+      <height>851</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1600</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>Fi&amp;le</string>
+    </property>
+    <addaction name="actionOpen"/>
+    <addaction name="separator"/>
+    <addaction name="actionOpen_Multi_file"/>
+    <addaction name="actionQuit"/>
+   </widget>
+   <widget class="QMenu" name="menuAnalyse">
+    <property name="title">
+     <string>Anal&amp;yse</string>
+    </property>
+    <widget class="QMenu" name="menu_Channel">
+     <property name="title">
+      <string>&amp;Channel</string>
+     </property>
+     <addaction name="actionAll"/>
+     <addaction name="actionOne_Channel"/>
+     <addaction name="actionAll_Files_and_Channels"/>
+    </widget>
+    <addaction name="menu_Channel"/>
+    <addaction name="actionCounter"/>
+    <addaction name="actionTimestamp"/>
+    <addaction name="separator"/>
+    <addaction name="actionToto"/>
+    <addaction name="actionCounter_and_trigger"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuAnalyse"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actionOpen">
+   <property name="text">
+    <string>&amp;Open</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>&amp;Quit</string>
+   </property>
+  </action>
+  <action name="actionCounter">
+   <property name="text">
+    <string>C&amp;ounter</string>
+   </property>
+  </action>
+  <action name="actionTimestamp">
+   <property name="text">
+    <string>&amp;Timestamp</string>
+   </property>
+  </action>
+  <action name="actionToto">
+   <property name="text">
+    <string>toto</string>
+   </property>
+  </action>
+  <action name="actionOpen_Multi_file">
+   <property name="text">
+    <string>Open &amp;Multi file</string>
+   </property>
+  </action>
+  <action name="actionAll">
+   <property name="text">
+    <string>&amp;all Channels</string>
+   </property>
+  </action>
+  <action name="actionOne_Channel">
+   <property name="text">
+    <string>&amp;One Channel</string>
+   </property>
+  </action>
+  <action name="actionAll_Files_and_Channels">
+   <property name="text">
+    <string>All &amp;Files and Channels</string>
+   </property>
+  </action>
+  <action name="actionCounter_and_trigger">
+   <property name="text">
+    <string>counter and trigger</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>
