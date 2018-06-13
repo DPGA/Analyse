@@ -23,7 +23,7 @@ set(BoldMagenta "${Esc}[1;35m")
 set(BoldCyan    "${Esc}[1;36m")
 set(BoldWhite   "${Esc}[1;37m")
 
-
+set (CMAKE_CXX_STANDARD 11)
 
 if(DAQ_PROJECT_PATH)
 	
@@ -47,7 +47,7 @@ find_package(Qt5PrintSupport REQUIRED)
 find_library (QWT_LIBRARIES NAMES qwt6 qwt6-qt5 qwt qwt-qt5)
 
 include_directories(	${Qt5Widgets_INCLUDES} ./include/ $ENV{DAQ_PROJECT_PATH}/include  ${LIB_QCUSTOMPLOT_PATH}/src
-							${LIB_DECODEFRAME_PATH}/include /usr/local/include /usr/local/qwt)
+							${LIB_DECODEFRAME_PATH}/include /usr/local/include /usr/local/qwt/include)
 
 add_definitions(${Qt5Widgets_DEFINITIONS})
 
