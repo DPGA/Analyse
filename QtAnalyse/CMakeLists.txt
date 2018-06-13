@@ -30,7 +30,7 @@ if(DAQ_PROJECT_PATH)
 else()
 	if(DEFINED ENV{DAQ_PROJECT_PATH})
 		
-		set (LIB_QCUSTOMPLOT_PATH $ENV{DAQ_PROJECT_PATH}/libqcustomplot)
+		set (LIB_QCUSTOMPLOT_PATH $ENV{DAQ_PROJECT_PATH}/Lib/libqcustomplot)
 		set (LIB_SHM_PATH $ENV{DAQ_PROJECT_PATH}/libshm)
 		set (LIB_DECODEFRAME_PATH $ENV{DAQ_PROJECT_PATH}/libframe)
 		set (DAQ_PROJECT_PATH $ENV{DAQ_PROJECT_PATH})
@@ -46,7 +46,7 @@ find_package(Qt5Widgets REQUIRED)
 find_package(Qt5PrintSupport REQUIRED)
 find_library (QWT_LIBRARIES NAMES qwt6 qwt6-qt5 qwt qwt-qt5)
 
-include_directories(	${Qt5Widgets_INCLUDES} ./include/ $ENV{DAQ_PROJECT_PATH}/include  ${LIB_QCUSTOMPLOT_PATH}/include 
+include_directories(	${Qt5Widgets_INCLUDES} ./include/ $ENV{DAQ_PROJECT_PATH}/include  ${LIB_QCUSTOMPLOT_PATH}/src
 							${LIB_DECODEFRAME_PATH}/include /usr/local/include /usr/include/qwt)
 
 add_definitions(${Qt5Widgets_DEFINITIONS})
