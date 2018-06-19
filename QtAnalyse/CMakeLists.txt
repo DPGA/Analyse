@@ -44,7 +44,19 @@ link_directories(/usr/local/lib  /usr/lib/qwt ${DAQ_PROJECT_PATH}/build/lib)
 
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5PrintSupport REQUIRED)
-find_library (QWT_LIBRARIES NAMES qwt6 qwt6-qt5 qwt qwt-qt5)
+
+
+set(QWT_LIBRARY_NAMES qwt-qt5 qwt6-qt5 qwt qwt6)
+find_library(QWT_LIBRARIES
+  NAMES ${QWT_LIBRARY_NAMES}
+  PATHS
+    /usr/lib
+    /usr/local/qwt/lib
+    /usr/local/lib/qt5
+    "$ENV{LIB_DIR}/lib"
+    "$ENV{LIB}"
+)
+#find_library (QWT_LIBRARIES NAMES qwt6 qwt6-qt5 qwt qwt-qt5)
 
 include_directories(	${Qt5Widgets_INCLUDES} ./include/ $ENV{DAQ_PROJECT_PATH}/include  ${LIB_QCUSTOMPLOT_PATH}/src
 							${LIB_DECODEFRAME_PATH}/include /usr/local/include /usr/local/qwt/include)
